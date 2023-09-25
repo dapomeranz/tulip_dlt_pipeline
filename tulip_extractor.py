@@ -57,7 +57,7 @@ def tulip_table_source(
 
 
 pipeline = dlt.pipeline(
-    destination="postgres",
+    destination="postgres",  # NOTE - change this field depending on your destination e.g. switch to bigquery to use bigquery
     pipeline_name="tulip_table_pipeline",
     dataset_name="tulip_table_data",  # NOTE - dataset_name will be the name of the schema in your db
 )
