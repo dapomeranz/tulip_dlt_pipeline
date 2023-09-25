@@ -12,6 +12,22 @@ def tulip_table_source(
 ):
     headers = {"Authorization": api_secret_key}
 
+    def get_request_params(i, last_updated):
+        return {
+            "limit": 100,
+            "offset": i * 100,
+            "filters": json.dumps(
+                [
+                    {
+                        "field": "_updatedAt",
+                        "functionType": "greaterThan",
+                        "arg": last_updated.start_value,
+                    }
+                ]
+            ),
+            "sortOptions": json.dumps([{"sortBy": "_updatedAt", "sortDir": "asc"}]),
+        }
+
     def tulip_table_resource(
         table_id,
         headers,
@@ -23,24 +39,7 @@ def tulip_table_source(
             print(f"Fetching page {i} of {table_id}")
             print(f"Last updated: {last_updated.start_value}")
             results = requests.get(
-                url,
-                headers=headers,
-                params={
-                    "limit": 100,
-                    "offset": i * 100,
-                    "filters": json.dumps(
-                        [
-                            {
-                                "field": "_updatedAt",
-                                "functionType": "greaterThan",
-                                "arg": last_updated.start_value,
-                            }
-                        ]
-                    ),
-                    "sortOptions": json.dumps(
-                        [{"sortBy": "_updatedAt", "sortDir": "asc"}]
-                    ),
-                },
+                url, headers=headers, params=get_request_params(i, last_updated)
             )
             if results.status_code != 200 or len(results.json()) == 0:
                 break
@@ -52,7 +51,7 @@ def tulip_table_source(
             tulip_table_resource,
             name=table_name,
             primary_key="id",
-            write_disposition="merge",  # NOTE - switch to replace to do a full rebuild
+            write_disposition="replace",  # NOTE - switch to replace to do a full rebuild
         )(table_id, headers)
 
 
