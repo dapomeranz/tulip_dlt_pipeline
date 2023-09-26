@@ -51,7 +51,7 @@ def tulip_table_source(
             tulip_table_resource,
             name=table_name,
             primary_key="id",
-            write_disposition="replace",  # NOTE - switch to replace to do a full rebuild
+            write_disposition="merge",  # NOTE - switch to replace to do a full rebuild
         )(table_id, headers)
 
 
